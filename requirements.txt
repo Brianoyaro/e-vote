@@ -1,0 +1,4 @@
+flask
+flask-wtf
+python-dotenv
+pymongo

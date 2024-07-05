@@ -36,4 +36,23 @@ def home():
 def register(token):
     form = NewConstituencyForm()
     voter = redisClient.hgetall(token)
-    return render_template('new_constituency.html', form=form, voter=voter)
+    if form.validate_on_submit():
+        county = form.county.data
+        constituency = form.constituency.data
+        if county != '':
+            voter['county'] = county
+        if constituency != '':
+            voter['constituency'] = constituency
+        if county != '' or constituency != '':
+            # delete user from redis
+            redisClient.delete(token)
+            # insert a new user in redis with updated information
+            token = str(uuid.uuid4())
+            redisClient.hset(token, mapping=voter)
+        return redirect(url_for('president', token=token))
+    return render_template('new_constituency.html', form=form, voter=voter, token=token)
+
+@app.route('/president/<token>', methods=['GET', 'POST'])
+def president(token):
+    voter = redisClient.hgetall(token)
+    return '<p>This is for presidential voting</p>'

@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
-	<p> Karibu {{ voter['name'] }} to e-vote. You are about to vote as a member of {{ voter['county'] }} county and {{ voter['constituency'] }}. If you wish to vote as a memberof another region, kindly fill the form below. Otherwise, click continue</p>
-	<a href='#'>Continue</a>
+	<p> Karibu {{ voter['name'] }} to e-vote.<br>
+	You are about to vote as a member of {{ voter['county'] }} county and {{ voter['constituency'] }} constituency.<br>
+	If you wish to vote as a member of another region, kindly fill the form below. Otherwise, click continue</p>
+	<a href='{{ url_for("president", token=token) }}'>Continue</a>
 	<form action='' method='post'>
 		{{ form.hidden_tag() }}
 		<p>{{ form.county.label}} {{ form.county() }}</p>
