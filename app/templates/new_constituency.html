@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+{% block content %}
+	<p> Karibu {{ voter['name'] }} to e-vote. You are about to vote as a member of {{ voter['county'] }} county and {{ voter['constituency'] }}. If you wish to vote as a memberof another region, kindly fill the form below. Otherwise, click continue</p>
+	<a href='#'>Continue</a>
+	<form action='' method='post'>
+		{{ form.hidden_tag() }}
+		<p>{{ form.county.label}} {{ form.county() }}</p>
+		<p>{{ form.constituency.label}} {{ form.constituency() }}</p>
+		<p>{{ form.submit.label }} {{ form.submit() }}</p>
+	</form>
+{% endblock %}

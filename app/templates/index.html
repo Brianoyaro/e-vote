@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+	<p>Login Page</p>
+	<form action='' method='post'>
+		<legend>e-vote</legend>
+		{{ form.hidden_tag() }}
+		<p>{{ form.idNumber.label }}</p></br>
+		<p>{{ form.idNumber() }}</p></br>
+		<p>{{ form.serialNumber.label }}</p></br>
+		<p>{{ form.serialNumber() }}</p></br>
+		<p>{{ form.submit.label }} {{ form.submit() }}</p></br>
+	</form>
+{% endblock%}
