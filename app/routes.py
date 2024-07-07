@@ -67,7 +67,7 @@ def president(token):
         redisClient.incr(president, 1)
         return redirect(url_for('governor', token=token))
     candidates = candidates_collection.find({'position': 'president'}, {'_id': 0, 'name': 1, 'party': 1})
-    return render_template('voting2.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')
+    return render_template('voting.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')
 
 @app.route('/governor/<token>', methods=['GET', 'POST'])
 def governor(token):
