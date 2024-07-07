@@ -4,8 +4,8 @@
 	<form action='' method='post'>
 		<legend>Enter the following details as they appear in your ID card to continue:</legend>
 		{{ form.hidden_tag() }}
-		<p>{{ form.idNumber.label }} {{ form.idNumber() }}</p></br>
-		<p>{{ form.serialNumber.label }} {{ form.serialNumber() }}</p></br>
+		<p>{{ form.idNumber.label }} {{ form.idNumber() }}</p>
+		<p>{{ form.serialNumber.label }} {{ form.serialNumber() }}</p>
 		<p>{{ form.submit.label }} {{ form.submit() }}</p>
 	</form>
 {% endblock%}

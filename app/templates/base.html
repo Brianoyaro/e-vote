@@ -1,21 +1,23 @@
-<!DOCTYPE>
-<html>
-	<head>
-		{% if title %}
-			<title>{{ title }}</title>
-		{% else %}
-			<title>e-vote</title>
-		{% endif %}
-	</head>
-	<body>
-		{% with messages = get_flashed_messages() %}
-		{% if messages %}
-			{% for message in messages %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+	{% if title %}
+		<title>{{ title }}</title>
+	{% else %}
+		<title>e-vote</title>
+	{% endif %}
+</head>
+<body>
+	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+		{% for message in messages %}
 			<p>{{ message }}</p>
-			{% endfor %}
-		{% endif %}
-		{% endwith %}
-		{% block content %}
-		{% endblock %}
-	</body>
+		{% endfor %}
+	{% endif %}
+	{% endwith %}
+	{% block content %}
+	{% endblock %}
+</body>
 </html>

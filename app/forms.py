@@ -13,3 +13,10 @@ class NewConstituencyForm(FlaskForm):
     constituency = StringField('New constituency', validators=[])
     county = StringField('New county', validators=[])
     submit = SubmitField('submit')
+
+class ChoiceForm(FlaskForm):
+    choice = StringField('Enter candidate')
+    submit = SubmitField('submit')
+
+class SubmitForm(FlaskForm):
+    submit = SubmitField('submit')

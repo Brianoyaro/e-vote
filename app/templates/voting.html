@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>{{ logo }}</p>
+<table>
+	{% for candidate in candidates %}
+	<tr>
+		<td>{{ candidate.name }}</td>
+		<td>{{ candidate.party }}</td>
+	</tr>
+	{% endfor %}
+</table>
+<hr>
+<form action='' method='post'>
+	{{ form.hidden_tag() }}
+	<p>{{ form.choice.label }}<p>
+	<p>{{ form.choice() }}</p>
+	<p>{{ form.submit.label }} {{ form.submit() }}</p>
+</form>
+{% endblock %}

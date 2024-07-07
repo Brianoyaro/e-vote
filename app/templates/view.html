@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>My candidates choices:</p>
+<ol>
+	<li>President: {{ mapping.get('president') }}</li>
+	<li>Governor: {{ mapping.get('governor') }}</li>
+	<li>MP: {{ mapping.get('mp') }}</li>
+</ol>
+<form action='' method='post'>
+	{{ form.hidden_tag() }}
+	<p>{{ form.submit.label }} {{ form.submit() }}</p>
+</form>
+{% endblock %}
