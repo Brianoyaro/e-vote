@@ -107,7 +107,14 @@ def governor(token):
     if not voter_county:
         voter_county = voter.get('county')
     candidates = candidates_collection.find({'position': 'governor', 'county': voter_county}, {'_id': 0})
-    form = ChoiceForm()
+    '''form = ChoiceForm()
+    if form.validate_on_submit():
+        governor = form.choice.data
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'governor': governor}})
+        redisClient.incr(governor, 1)
+        return redirect(url_for('mp', token=token))'''
+    form = ChoiceForm2()
+    form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
         governor = form.choice.data
         voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'governor': governor}})
@@ -123,12 +130,19 @@ def mp(token):
     if not voter_constituency:
         voter_constituency = voter.get('constituency')
     candidates = candidates_collection.find({'position': 'MP', 'constituency': voter_constituency}, {'_id': 0})
-    form = ChoiceForm()
+    '''form = ChoiceForm()
     if form.validate_on_submit():
         mp = form.choice.data
         voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'mp': mp}})
         redisClient.incr(mp, 1)
         # return render_template('view.html')
+        return redirect(url_for('view', token=token))'''
+    form = ChoiceForm2()
+    form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
+    if form.validate_on_submit():
+        mp = form.choice.data
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'mp': mp}})
+        redisClient.incr(mp, 1)
         return redirect(url_for('view', token=token))
     return render_template('voting.html', form=form, candidates=candidates, voter=voter, logo='{} MP Candidates'.format(voter_constituency))
 
