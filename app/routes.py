@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, flash
-from app.forms import LoginForm, NewConstituencyForm, ChoiceForm, SubmitForm
+from app.forms import LoginForm, NewConstituencyForm, ChoiceForm, SubmitForm, ChoiceForm2
 from app import app, redisClient, voters_collection as voters, candidates_collection
 import uuid
 
@@ -79,11 +79,8 @@ def register(token):
 def president(token):
     current_user = redisClient.hgetall(token)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))})
-    candidates = candidates_collection.find({'position': 'president'}, {'_id': 0})
-    '''if request.method == 'POST':
-        post_data = request.data
-        return post_data'''
-    form = ChoiceForm()
+    candidates = list(candidates_collection.find({'position': 'president'}, {'_id': 0}))
+    '''form = ChoiceForm()
     if form.validate_on_submit():
         president = form.choice.data
         voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'president': president}})
@@ -91,7 +88,16 @@ def president(token):
         redisClient.incr(president, 1)
         # find a way to backup storage in a different place apart from redis e.g in mongo
         return redirect(url_for('governor', token=token))
-    return render_template('voting.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')
+    return render_template('voting.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')'''
+    form = ChoiceForm2()
+    form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
+    if form.validate_on_submit():
+        president = form.choice.data
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'president': president}})
+        redisClient.incr(president, 1)
+        return redirect(url_for('governor', token=token))
+    candidates = candidates_collection.find({'position': 'president'}, {'_id': 0, 'name': 1, 'party': 1})
+    return render_template('voting2.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')
 
 @app.route('/governor/<token>', methods=['GET', 'POST'])
 def governor(token):

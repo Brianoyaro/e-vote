@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField, SubmitField, RadioField
 from wtforms.validators import DataRequired
 
 
@@ -16,6 +16,10 @@ class NewConstituencyForm(FlaskForm):
 
 class ChoiceForm(FlaskForm):
     choice = StringField('Enter candidate')
+    submit = SubmitField('submit')
+
+class ChoiceForm2(FlaskForm):
+    choice = RadioField('Candidate', choices=[])
     submit = SubmitField('submit')
 
 class SubmitForm(FlaskForm):
