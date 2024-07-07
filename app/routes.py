@@ -4,33 +4,12 @@ from app import app, redisClient, voters_collection as voters, candidates_collec
 import uuid
 
 
-data = [
-        {'idNumber': 1, 'serialNumber': 1, 'name': 'Brian Mokua', 'county': 'Mombasa', 'constituency': 'Kiasuni'},
-        {'idNumber': 2, 'serialNumber': 2, 'name': 'Johnstone Kahindi', 'county': 'Kilifi', 'constituency': 'Kilifi-poly'},
-        {'idNumber': 3, 'serialNumber': 3, 'name': 'Sylvetser Onyango', 'county': 'Kajiado', 'constituency': 'Kiserian'}
-        ]
-
 @app.route('/', methods=['GET', 'POST'])
 def home():
     form = LoginForm()
     if form.validate_on_submit():
         idNumber = int(form.idNumber.data)
         serialNumber = int(form.serialNumber.data)
-        '''found = False
-        for user in data:
-            if user['idNumber'] == idNumber and user['serialNumber'] == serialNumber:
-                found = True
-                token = str(uuid.uuid4())
-                redisClient.hset(token, mapping=user)
-                # expire the key after 1.5 days
-                redisClient.expire(token, 129600)
-                # to delete the  key
-                # redisClient.delete(token)
-        if found:
-            return redirect(url_for('register', token=token))
-        if not found:
-            flash('Credentials do not match. Try again')'''
-        
         user = voters.find_one({'idNumber': idNumber, 'serialNumber': serialNumber}, {'_id': 0})
         if not user:
             flash('Credentials do not match. Try again')
@@ -80,15 +59,6 @@ def president(token):
     current_user = redisClient.hgetall(token)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))})
     candidates = list(candidates_collection.find({'position': 'president'}, {'_id': 0}))
-    '''form = ChoiceForm()
-    if form.validate_on_submit():
-        president = form.choice.data
-        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'president': president}})
-        # in redis, incr the presidential candidate
-        redisClient.incr(president, 1)
-        # find a way to backup storage in a different place apart from redis e.g in mongo
-        return redirect(url_for('governor', token=token))
-    return render_template('voting.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')'''
     form = ChoiceForm2()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
@@ -107,12 +77,6 @@ def governor(token):
     if not voter_county:
         voter_county = voter.get('county')
     candidates = candidates_collection.find({'position': 'governor', 'county': voter_county}, {'_id': 0})
-    '''form = ChoiceForm()
-    if form.validate_on_submit():
-        governor = form.choice.data
-        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'governor': governor}})
-        redisClient.incr(governor, 1)
-        return redirect(url_for('mp', token=token))'''
     form = ChoiceForm2()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
@@ -130,13 +94,6 @@ def mp(token):
     if not voter_constituency:
         voter_constituency = voter.get('constituency')
     candidates = candidates_collection.find({'position': 'MP', 'constituency': voter_constituency}, {'_id': 0})
-    '''form = ChoiceForm()
-    if form.validate_on_submit():
-        mp = form.choice.data
-        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'mp': mp}})
-        redisClient.incr(mp, 1)
-        # return render_template('view.html')
-        return redirect(url_for('view', token=token))'''
     form = ChoiceForm2()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
@@ -159,6 +116,7 @@ def view(token):
     form = SubmitForm()
     if form.validate_on_submit():
         voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'status': 'voted'}})
+        redisClient.delete(token)
         flash('You have finished voting')
         return redirect(url_for('home'))
     return render_template('view.html', mapping=mapping, form=form)
