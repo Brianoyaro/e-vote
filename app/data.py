@@ -9,6 +9,13 @@ voters_collection = db['voters']
 # voters_collection.create_index([("idNumber", pymongo.ASCENDING)], unique=True)
 # candidates collection
 candidates_collection = db['candidates']
+geo = db['geo']
+
+places = [
+        {'county': 'Mombasa', 'constituencies': ['Kisauni', 'Likoni', 'Kashani']},
+        {'county': 'Nairobi', 'constituencies': ['Mwiki', 'CBD']}
+        ]
+
 voters = [
         {'idNumber': 1, 'serialNumber': 1, 'name': 'Brian Mokua', 'county': 'Mombasa', 'constituency': 'Kisauni'},
         {'idNumber': 2, 'serialNumber': 2, 'name': 'Johnstone Kahindi', 'county': 'Kilifi', 'constituency': 'Kilifi-poly'},
@@ -27,6 +34,10 @@ candidates = [
     {'position': 'MP', 'name': 'Samuel Mrefu', 'party': 'gen-Z', 'constituency': 'Kisauni'},
     {'position': 'MP', 'name': 'Belinda Atieno', 'party': 'ODM', 'constituency': 'Kisauni'}
 ]
+# places storage
+geo.delete_many({})
+for place in places:
+    geo.insert_one(place)
 # voter storage
 voters_collection.delete_many({})
 for voter in voters:
@@ -36,10 +47,10 @@ candidates_collection.delete_many({})
 for candidate in candidates:
     candidates_collection.insert_one(candidate)
 
-user = voters_collection.find_one({'idNumber': 1, 'serialNumber': 1})
+# user = voters_collection.find_one({'idNumber': 1, 'serialNumber': 1})
 # print(voters_collection.index_information())
 # voters_collection.update_one({'idNumber': 1}, {'$set': {'updatedCounty': 'London'}})
-print(voters_collection.find_one({'idNumber': 1}).get('updatedCounty'))
-presidents = [x for x in candidates_collection.find({'position': 'president'}, {'_id': 0, 'position': 0, 'party': 0})]
+# print(voters_collection.find_one({'idNumber': 1}).get('updatedCounty'))
+# presidents = [x for x in candidates_collection.find({'position': 'president'}, {'_id': 0, 'position': 0, 'party': 0})]
 # print(presidents)
-print({'name': 'Raila Odinga'} in presidents)
+# print({'name': 'Raila Odinga'} in presidents)

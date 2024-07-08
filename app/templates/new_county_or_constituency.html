@@ -1,0 +1,8 @@
+{% extends 'base.html' %}
+{% block content %}
+	<p> Karibu {{ mapping['name'] }} to e-vote.<br>
+	You are about to vote as a member of {{ mapping['county'] }} county and {{ mapping['constituency'] }} constituency.<br>
+	If you wish to vote as a member of another region, kindly fill the form below. Otherwise, click continue</p>
+	<a href='{{ url_for("change_county", token=token) }}'>Change County</a> <a href='{{ url_for("change_constituency", token=token) }}'>Change Constituency</a>
+	<br><a href='{{ url_for("president", token=token) }}'>Continue</a>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block content %}
+<p>{{ logo }}</p>
+<form action="" method="post">
+    {{ form.hidden_tag() }}
+    <table>
+        {% for choice in form.place %}
+        <tr>
+            <td>
+                {{ choice }}
+            </td>
+            <td>
+                <label for="{{ choice.id }}">
+                    {{ choice.label.text }}
+                </label>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    <hr>
+    <p>{{ form.submit.label }} {{ form.submit() }}</p>
+</form>
+{% endblock %}
+

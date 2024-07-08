@@ -14,5 +14,6 @@ db =  client['e_vote']
 # create a voters collection and candidates collection
 voters_collection = db['voters']
 candidates_collection = db['candidates']
+geo = db['geo']
 
 from app import routes

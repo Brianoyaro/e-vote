@@ -8,19 +8,13 @@ class LoginForm(FlaskForm):
     serialNumber = StringField('serial Number', validators=[DataRequired()])
     submit = SubmitField('submit')
 
-
-class NewConstituencyForm(FlaskForm):
-    constituency = StringField('New constituency', validators=[])
-    county = StringField('New county', validators=[])
-    submit = SubmitField('submit')
-
 class ChoiceForm(FlaskForm):
-    choice = StringField('Enter candidate')
-    submit = SubmitField('submit')
-
-class ChoiceForm2(FlaskForm):
-    choice = RadioField('Candidate', choices=[])
+    choice = RadioField('Candidate', choices=[], validators=[DataRequired()])
     submit = SubmitField('submit')
 
 class SubmitForm(FlaskForm):
+    submit = SubmitField('submit')
+
+class ChangePlaceForm(FlaskForm):
+    place = RadioField('Constituency', choices=[], validators=[DataRequired()])
     submit = SubmitField('submit')

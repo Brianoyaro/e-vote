@@ -1,9 +1,12 @@
-from flask import render_template, request, redirect, url_for, flash
-from app.forms import LoginForm, NewConstituencyForm, ChoiceForm, SubmitForm, ChoiceForm2
-from app import app, redisClient, voters_collection as voters, candidates_collection
+from flask import render_template, request, redirect, url_for, flash, abort
+from app.forms import LoginForm, SubmitForm, ChoiceForm, ChangePlaceForm
+from app import app, redisClient, voters_collection as voters, candidates_collection, geo
 import uuid
 
 
+@app.errorhandler(404)
+def Not_found_error(error):
+    return render_template('404.html')
 @app.route('/', methods=['GET', 'POST'])
 def home():
     form = LoginForm()
@@ -22,8 +25,8 @@ def home():
             flash('Logged in successfully. You can now vote!')
             token = str(uuid.uuid4())
             redisClient.hset(token, mapping=user)
-            # expire the key after 1.5 days
-            redisClient.expire(token, 129600)
+            # expire the key after 30 minutes
+            redisClient.expire(token, 1800)
             # to delete the  key
             # redisClient.delete(token)
             return redirect(url_for('register', token=token))
@@ -31,35 +34,35 @@ def home():
 
 @app.route('/register/<token>', methods=['GET', 'POST'])
 def register(token):
-    form = NewConstituencyForm()
-    voter = redisClient.hgetall(token)
-    voterId = voter.get('idNumber')
-    voterId = int(voterId)
+    current_user = redisClient.hgetall(token)
+    print(current_user)
+    if not current_user:
+        abort(404)
+    form = SubmitForm()
     if form.validate_on_submit():
-        county = form.county.data
-        constituency = form.constituency.data
-        if county != '':
-            # voter['county'] = county
-            voters.update_one({'idNumber': voterId},{'$set': {'votingCounty': county}})
-        if constituency != '':
-            # voter['constituency'] = constituency
-            voters.update_one({'idNumber': voterId}, {'$set': {'votingConstituency': constituency}})
-        if county != '' or constituency != '':
-            # delete user from redis
-            redisClient.delete(token)
-            voter = voters.find_one({'idNumber': voterId}, {'_id': 0})
-            # insert a new user in redis with updated information
-            token = str(uuid.uuid4())
-            redisClient.hset(token, mapping=voter)
         return redirect(url_for('president', token=token))
-    return render_template('new_constituency.html', form=form, voter=voter, token=token)
+    voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))})
+    user_county = voter.get('votingCounty')
+    if not user_county:
+        user_county = voter.get('county')
+    user_constituency = voter.get('votingConstituency')
+    if not user_constituency:
+        user_constituency = voter.get('constituency')
+    mapping = {
+            'name': current_user.get('name'),
+            'county': user_county,
+            'constituency': user_constituency
+            }
+    return render_template('new_county_or_constituency.html', form=form, mapping=mapping, token=token)
 
 @app.route('/president/<token>', methods=['GET', 'POST'])
 def president(token):
     current_user = redisClient.hgetall(token)
+    if not current_user:
+        abort(404)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))})
     candidates = list(candidates_collection.find({'position': 'president'}, {'_id': 0}))
-    form = ChoiceForm2()
+    form = ChoiceForm()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
         president = form.choice.data
@@ -72,12 +75,14 @@ def president(token):
 @app.route('/governor/<token>', methods=['GET', 'POST'])
 def governor(token):
     current_user = redisClient.hgetall(token)
+    if not current_user:
+        abort(404)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'_id': 0})
     voter_county = voter.get('votingCounty')
     if not voter_county:
         voter_county = voter.get('county')
     candidates = candidates_collection.find({'position': 'governor', 'county': voter_county}, {'_id': 0})
-    form = ChoiceForm2()
+    form = ChoiceForm()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
         governor = form.choice.data
@@ -89,12 +94,14 @@ def governor(token):
 @app.route('/mp/<token>', methods=['GET', 'POST'])
 def mp(token):
     current_user = redisClient.hgetall(token)
+    if not current_user:
+        abort(404)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'_id': 0})
     voter_constituency = voter.get('votingConstituency')
     if not voter_constituency:
         voter_constituency = voter.get('constituency')
     candidates = candidates_collection.find({'position': 'MP', 'constituency': voter_constituency}, {'_id': 0})
-    form = ChoiceForm2()
+    form = ChoiceForm()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
         mp = form.choice.data
@@ -107,6 +114,8 @@ def mp(token):
 @app.route('/view/<token>', methods=['GET', 'POST'])
 def view(token):
     current_user = redisClient.hgetall(token)
+    if not current_user:
+        abort(404)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'id': 0})
     mapping = {
             'president': voter.get('president'),
@@ -116,7 +125,45 @@ def view(token):
     form = SubmitForm()
     if form.validate_on_submit():
         voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'status': 'voted'}})
+        # delete token current_user from redis to save up space
         redisClient.delete(token)
         flash('You have finished voting')
         return redirect(url_for('home'))
     return render_template('view.html', mapping=mapping, form=form)
+
+@app.route('/change_county/<token>', methods=['GET', 'POST'])
+def change_county(token):
+    current_user = redisClient.hgetall(token)
+    if not current_user:
+        abort(404)
+    voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'id': 0})
+    all_counties = list(geo.find({}, {'_id': 0, 'constituency': 0}))
+    form = ChangePlaceForm()
+    form.place.choices = [(c['county'], c['county']) for c in all_counties]
+    if form.validate_on_submit():
+        # county = form.county.data
+        county = form.place.data
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'votingCounty': county}})
+        return redirect(url_for('register', token=token))
+    return render_template('change_place.html', form=form, logo='All Counties')
+
+@app.route('/change_constituency/<token>', methods=['GET', 'POST'])
+def change_constituency(token):
+    current_user = redisClient.hgetall(token)
+    if not current_user:
+        abort(404)
+    voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'id': 0})
+    user_county = voter.get('votingCounty')
+    if not user_county:
+        user_county = voter.get('county')
+    constituencies = list(geo.find({'county': user_county}, {'_id': 0, 'county': 0}))
+    # to handle out of range error
+    if len(constituencies) == 0:
+        constituencies = [{'constituencies': []}]
+    form = ChangePlaceForm()
+    form.place.choices = [(c, c) for c in constituencies[0].get('constituencies')]
+    if form.validate_on_submit():
+        constituency = form.place.data
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'votingConstituency': constituency}})
+        return redirect(url_for('register', token=token))
+    return render_template('change_place.html', form=form, logo='{} constituencies'.format(user_county))

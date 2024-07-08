@@ -5,7 +5,13 @@
 		<legend>Enter the following details as they appear in your ID card to continue:</legend>
 		{{ form.hidden_tag() }}
 		<p>{{ form.idNumber.label }} {{ form.idNumber() }}</p>
+		{% for error in form.idNumber.errors %}
+			<span style="color: red">{{ error }}</span>
+		{% endfor %}
 		<p>{{ form.serialNumber.label }} {{ form.serialNumber() }}</p>
+		{% for error in form.serialNumber.errors %}
+			<span style="color: red">{{ error }}</span>
+		{% endfor %}
 		<p>{{ form.submit.label }} {{ form.submit() }}</p>
 	</form>
 {% endblock%}
