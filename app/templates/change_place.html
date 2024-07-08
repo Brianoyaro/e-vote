@@ -7,18 +7,21 @@
         {% for choice in form.place %}
         <tr>
             <td>
-                {{ choice }}
+                {{ choice(class="form-control") }}
             </td>
             <td>
                 <label for="{{ choice.id }}">
-                    {{ choice.label.text }}
+                    {{ choice.label(class="form-label") }}
                 </label>
             </td>
         </tr>
         {% endfor %}
+	{% for error in form.place.error %}
+	<div class='alert alert-danger' role='alert'>{{ error }}</div>
+	{% endfor %}
     </table>
     <hr>
-    <p>{{ form.submit.label }} {{ form.submit() }}</p>
+    <p>{{ form.submit(class="btn btn-outline-info") }}</p>
 </form>
 {% endblock %}
 
