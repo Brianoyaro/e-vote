@@ -25,8 +25,8 @@ def home():
             flash('Logged in successfully. You can now vote!')
             token = str(uuid.uuid4())
             redisClient.hset(token, mapping=user)
-            # expire the key after 30 minutes
-            redisClient.expire(token, 1800)
+            # expire the key after 10 minutes
+            redisClient.expire(token, 600)
             # to delete the  key
             # redisClient.delete(token)
             return redirect(url_for('register', token=token))
@@ -35,7 +35,6 @@ def home():
 @app.route('/register/<token>', methods=['GET', 'POST'])
 def register(token):
     current_user = redisClient.hgetall(token)
-    print(current_user)
     if not current_user:
         abort(404)
     form = SubmitForm()
@@ -64,10 +63,21 @@ def president(token):
     candidates = list(candidates_collection.find({'position': 'president'}, {'_id': 0}))
     form = ChoiceForm()
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
+    # the following lines tackle misusing of a token to vote unlimited times
+    my_president = voter.get('president')
+    if my_president:
+        redisClient.incr(my_president, -1)
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'president': ''}})
+        # reduce count of this particular candidate in mongo
+        candidates_collection.update_one({'name': my_president}, {'$inc': {'count': -1}})
+    # checking ends here
     if form.validate_on_submit():
         president = form.choice.data
+        # store that this voter selected this candidate
         voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'president': president}})
         redisClient.incr(president, 1)
+        # increase in mongo too
+        candidates_collection.update_one({'name': president}, {'$inc': {'count': 1}})
         return redirect(url_for('governor', token=token))
     candidates = candidates_collection.find({'position': 'president'}, {'_id': 0, 'name': 1, 'party': 1})
     return render_template('voting.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')
@@ -78,6 +88,14 @@ def governor(token):
     if not current_user:
         abort(404)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'_id': 0})
+    # the following lines tackle misusing of a token to vote unlimited times
+    my_governor = voter.get('governor')
+    if my_governor:
+        redisClient.incr(my_governor, -1)
+        # reduce count of this particular candidate in mongo
+        candidates_collection.update_one({'name': my_governor}, {'$inc': {'count': -1}})
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'governor': ''}})
+    # checking ends here
     voter_county = voter.get('votingCounty')
     if not voter_county:
         voter_county = voter.get('county')
@@ -86,8 +104,11 @@ def governor(token):
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
         governor = form.choice.data
+        # store that this voter selected this candidate
         voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'governor': governor}})
         redisClient.incr(governor, 1)
+        # increase in mongo too
+        candidates_collection.update_one({'name': governor}, {'$inc': {'count': 1}})
         return redirect(url_for('mp', token=token))
     return render_template('voting.html', form=form, candidates=candidates, voter=voter, logo='{} Governor Candidates'.format(voter_county))
 
@@ -97,6 +118,14 @@ def mp(token):
     if not current_user:
         abort(404)
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))}, {'_id': 0})
+    # the following lines tackle misusing of a token to vote unlimited times
+    my_mp = voter.get('mp')
+    if my_mp:
+        redisClient.incr(my_mp, -1)
+        # reduce count of this particular candidate in mongo
+        candidates_collection.update_one({'name': my_mp}, {'$inc': {'count': -1}})
+        voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'mp': ''}})
+    # checking ends here
     voter_constituency = voter.get('votingConstituency')
     if not voter_constituency:
         voter_constituency = voter.get('constituency')
@@ -105,8 +134,11 @@ def mp(token):
     form.choice.choices = [(c['name'], "{} ({})".format(c['name'], c['party'])) for c in candidates]
     if form.validate_on_submit():
         mp = form.choice.data
+        # store that this voter selected this candidate
         voters.update_one({'idNumber': int(current_user.get('idNumber'))}, {'$set': {'mp': mp}})
         redisClient.incr(mp, 1)
+        # increase in mongo too
+        candidates_collection.update_one({'name': mp}, {'$inc': {'count': 1}})
         return redirect(url_for('view', token=token))
     return render_template('voting.html', form=form, candidates=candidates, voter=voter, logo='{} MP Candidates'.format(voter_constituency))
 
@@ -125,11 +157,11 @@ def view(token):
     form = SubmitForm()
     if form.validate_on_submit():
         voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'status': 'voted'}})
-        # delete token current_user from redis to save up space
+        # delete token current_user from redis to save up space and prevent misuse of token
         redisClient.delete(token)
         flash('You have finished voting')
         return redirect(url_for('home'))
-    return render_template('view.html', mapping=mapping, form=form)
+    return render_template('view.html', mapping=mapping, form=form, token=token)
 
 @app.route('/change_county/<token>', methods=['GET', 'POST'])
 def change_county(token):

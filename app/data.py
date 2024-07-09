@@ -22,17 +22,17 @@ voters = [
         {'idNumber': 3, 'serialNumber': 3, 'name': 'Sylvetser Onyango', 'county': 'Kajiado', 'constituency': 'Kiserian'}
 ]
 candidates = [
-    {'position': 'president', 'name': 'Raila Odinga', 'party': 'ODM'},
-    {'position': 'president', 'name': 'Uhuru Kenyatta', 'party': 'Jubilee'},
-    {'position': 'president', 'name': 'Kalonzo Musyoka', 'party': 'Wiper'},
-    {'position': 'president', 'name': 'Brian Oyaro', 'party': 'gen-Z'},
+        {'position': 'president', 'name': 'Raila Odinga', 'party': 'ODM', 'count': 0},
+        {'position': 'president', 'name': 'Uhuru Kenyatta', 'party': 'Jubilee', 'count': 0},
+        {'position': 'president', 'name': 'Kalonzo Musyoka', 'party': 'Wiper','count': 0},
+        {'position': 'president', 'name': 'Brian Oyaro', 'party': 'gen-Z', 'count': 0},
 
-    {'position': 'governor', 'name': 'Bosobori Onyancha', 'party': 'ODM', 'county': 'Mombasa'},
-    {'position': 'governor', 'name': 'Kim Wanjala', 'party': 'Jubilee', 'county': 'Mombasa'},
-    {'position': 'governor', 'name': 'Sharon Mwai', 'party': 'wiper', 'county': 'Mombasa'},
+        {'position': 'governor', 'name': 'Bosobori Onyancha', 'party': 'ODM', 'county': 'Mombasa', 'count': 0},
+        {'position': 'governor', 'name': 'Kim Wanjala', 'party': 'Jubilee', 'county': 'Mombasa', 'count': 0},
+        {'position': 'governor', 'name': 'Sharon Mwai', 'party': 'wiper', 'county': 'Mombasa', 'count': 0},
 
-    {'position': 'MP', 'name': 'Samuel Mrefu', 'party': 'gen-Z', 'constituency': 'Kisauni'},
-    {'position': 'MP', 'name': 'Belinda Atieno', 'party': 'ODM', 'constituency': 'Kisauni'}
+        {'position': 'MP', 'name': 'Samuel Mrefu', 'party': 'gen-Z', 'constituency': 'Kisauni', 'count': 0},
+        {'position': 'MP', 'name': 'Belinda Atieno', 'party': 'ODM', 'constituency': 'Kisauni', 'count': 0}
 ]
 # places storage
 geo.delete_many({})
