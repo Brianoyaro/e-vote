@@ -16,4 +16,8 @@ voters_collection = db['voters']
 candidates_collection = db['candidates']
 geo = db['geo']
 
+
+from api import bp
+app.register_blueprint(bp)
+
 from app import routes
