@@ -6,6 +6,10 @@ import pymongo
 app = Flask(__name__)
 app.config.from_object(Config)
 redisClient = Redis()
+# I want to try the navbar
+import uuid
+app.secret_key = str(uuid.uuid4())
+# trying navbar ends here
 
 # create a mongo client
 client =pymongo.MongoClient()

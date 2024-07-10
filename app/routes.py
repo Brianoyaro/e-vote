@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, abort
+from flask import render_template, request, redirect, url_for, flash, abort, session
 from app.forms import LoginForm, SubmitForm, ChoiceForm, ChangePlaceForm
 from app import app, redisClient, voters_collection as voters, candidates_collection, geo
 import uuid
@@ -34,6 +34,8 @@ def home():
 
 @app.route('/register/<token>', methods=['GET', 'POST'])
 def register(token):
+    session['visited'] = True
+    session['token'] = token
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -56,6 +58,8 @@ def register(token):
 
 @app.route('/president/<token>', methods=['GET', 'POST'])
 def president(token):
+    session['visited'] = True
+    session['token'] = token
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -84,6 +88,8 @@ def president(token):
 
 @app.route('/governor/<token>', methods=['GET', 'POST'])
 def governor(token):
+    session['visited'] = True
+    session['token'] = token
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -114,6 +120,8 @@ def governor(token):
 
 @app.route('/mp/<token>', methods=['GET', 'POST'])
 def mp(token):
+    session['visited'] = True
+    session['token'] = token
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -145,6 +153,8 @@ def mp(token):
 
 @app.route('/view/<token>', methods=['GET', 'POST'])
 def view(token):
+    # session['visited'] = True
+    # session['token'] = token
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -156,6 +166,8 @@ def view(token):
             }
     form = SubmitForm()
     if form.validate_on_submit():
+        session['visited'] = False
+        session['token'] = None
         voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'status': 'voted'}})
         # delete token current_user from redis to save up space and prevent misuse of token
         redisClient.delete(token)
@@ -199,3 +211,7 @@ def change_constituency(token):
         voters.update_one({'idNumber': int(current_user.get('idNumber'))},{'$set': {'votingConstituency': constituency}})
         return redirect(url_for('register', token=token))
     return render_template('change_place.html', form=form, logo='{} constituencies'.format(user_county))
+
+@app.context_processor
+def is_navbar_valid():
+    return {'valid_navbar': session.get('visited', False), 'my_token': session.get('token')}
