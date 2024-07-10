@@ -2,8 +2,15 @@
 ---
 ### Introduction
 ---
-e_vote is an application which allows voters to vote from the comfort of their home without the hassle of making long queues. It has been created with security in mind that prevents fraudulous voting in the sense of voting multile times, guessing a random url so as to vote. 
-On the contestants side, they get to see their tally results in real time while the voting process is ongoing.
+e_vote is an application which allows voters to vote from the comfort of their home without the hassle of making long queues. It has been created with security in mind that it prevents fraudulous voting in the sense of:
+- voting multile times using a validated account
+- misusing the url to vote as an unidentified user
+- Offering redundancy of tally scores in different locations 
+- Each validated user is permited to vote in a limited time i.e 10 minutes ater which they'll have to login and start the entire process again
+
+On the contestants side, they get to see their tally results in real time while the voting process is ongoing which reduces discrepancies.
+
+e_vote has a nice UX which is easy to use.
 
 ### installation
 ---
