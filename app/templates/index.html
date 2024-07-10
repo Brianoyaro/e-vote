@@ -12,6 +12,6 @@
 		{% for error in form.serialNumber.errors %}
 			<div class="alert alert-danger" role="alert">{{ error }}</div>
 		{% endfor %}
-		<p>{{ form.submit(class="btn btn-outline-info") }}</p>
+		<p>{{ form.submit(class="btn btn-outline-info btn-sm") }}</p>
 	</form>
 {% endblock%}
