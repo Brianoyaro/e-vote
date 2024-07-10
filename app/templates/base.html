@@ -18,8 +18,9 @@
 		{% endfor %}
 	{% endif %}
 	{% endwith %}
-	{% include 'navbar.html' %}
 	<div class="container">
+		{% include 'navbar.html' %}
+		<hr>
 		{% block content %}
 		{% endblock %}
 	</div>

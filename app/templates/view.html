@@ -1,13 +1,25 @@
 {% extends 'base.html' %}
 {% block content %}
 <p>My candidates choices:</p>
-<ol>
-	<li>President: {{ mapping.get('president') }} <a href='{{ url_for("president", token=token) }}' class='btn btn-outline-info btn-sm'>Change</a></li>
-	<li>Governor: {{ mapping.get('governor') }} <a href='{{ url_for("governor", token=token) }}' class='btn btn-outline-info btn-sm'>Change</a></li>
-	<li>MP: {{ mapping.get('mp') }} <a href='{{ url_for("mp", token=token) }}' class='btn btn-outline-info btn-sm'>Change</a></li>
-</ol>
+<table class="table">
+	<tr>
+		<td>President:</td>
+		<td>{{ mapping.get('president') }}</td>
+		<td><a href='{{ url_for("president", token=token) }}' class='btn btn-outline-info btn-sm'>Change</a></td>
+	</tr>
+	<tr>
+		<td>Governor:</td>
+		<td>{{ mapping.get('governor') }}</td>
+		<td><a href='{{ url_for("governor", token=token) }}' class='btn btn-outline-info btn-sm'>Change</a></td>
+	</tr>
+	<tr>
+		<td>MP:</td>
+		<td>{{ mapping.get('mp') }}</td>
+		<td><a href='{{ url_for("mp", token=token) }}' class='btn btn-outline-info btn-sm'>Change</a></td>
+	</tr>
+</table>
 <form action='' method='post'>
 	{{ form.hidden_tag() }}
-	<p>{{ form.submit(class="btn btn-outline-info") }}</p>
+	<p>{{ form.submit(class="btn btn-outline-info btn-sm") }}</p>
 </form>
 {% endblock %}

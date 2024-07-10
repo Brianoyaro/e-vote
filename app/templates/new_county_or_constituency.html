@@ -3,6 +3,6 @@
 	<p> Karibu {{ mapping['name'] }} to e-vote.<br>
 	You are about to vote as a member of {{ mapping['county'] }} county and {{ mapping['constituency'] }} constituency.<br>
 	If you wish to vote as a member of another region, kindly fill the form below. Otherwise, click continue</p>
-	<a href='{{ url_for("change_county", token=token) }} ' class='btn btn-outline-info'>Change County</a> <a href='{{ url_for("change_constituency", token=token) }}' class="btn btn-outline-info">Change Constituency</a>
-	<a href='{{ url_for("president", token=token) }}' class="btn btn-outline-info">Continue</a>
+	<a href='{{ url_for("change_county", token=token) }} ' class='btn btn-outline-info btn-sm'>Change County</a> <a href='{{ url_for("change_constituency", token=token) }}' class="btn btn-outline-info btn-sm">Change Constituency</a>
+	<a href='{{ url_for("president", token=token) }}' class="btn btn-outline-info btn-sm">Continue</a>
 {% endblock %}
