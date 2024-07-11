@@ -12,11 +12,50 @@ On the contestants side, they get to see their tally results in real time while 
 
 e_vote has a nice UX which is easy to use.
 
-### installation
+### setup
 ---
 - First, clone the application and git pull on your local machine.
 - Install necessary dependencies in the requirements.txt file. If you are on a linux/unix system, pip install -r requirements.txt will do.
 - Start the application using flask run then use a suitable application server to serve the website to your clients
+
+### Architecture
+---
+e_vote was created with security in mind. Users have to login using credential in their national ID cards which helps distinguish candidate positions based on locality such as governors and MPs. Users have an option of changing their voting location simulating real world scenarios where they relocate to diferent regions to the ones recorded in their ID cards.
+Users have a time limit of 10 minutes to vote upon which on exhaustion requires them to relogin and vote again incase they did not submit their results.
+![alt text](https://github.com/Brianoyaro/e-vote/blob/main/app/static/logo.png "Logo")
+
+### /API
+---
+e_vote incorporates an api which allows one see vting results as they trickle in realtime. The api was desgned for candidates to have live feeds of results. It provides data in json format which can be intergrated to external services of choices for visual appeals as one might need.
+- /api/tally
+This endpoint shows tally results for all candidates in the entire system
+
+- /api/president/tally
+Shows tally results for presidential candidates
+
+- /api/governor/tally
+Shows tally results for governor candidates
+
+- /api/mp/tally
+Shows tally results for mp candidates
+
+- /api/candidates
+Shows all candidates competting in the voting process
+
+- /api/presidents
+Shows all presidential candidates competing
+
+- /api/governors/<county>
+Shows all governor candidates competing in a given county
+
+- /api/mps/<constituency>
+Shows all MP candidates competing in a given constitueny
+
+- /api/counties
+Shows all counties
+
+- /api/<county>/constituency
+Shows all constituencies in a given county
 
 ### Related projects
 ---

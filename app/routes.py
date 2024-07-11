@@ -7,8 +7,12 @@ import uuid
 @app.errorhandler(404)
 def Not_found_error(error):
     return render_template('404.html')
+
+
 @app.route('/', methods=['GET', 'POST'])
 def home():
+    '''index page of application
+    '''
     form = LoginForm()
     if form.validate_on_submit():
         idNumber = int(form.idNumber.data)
@@ -32,8 +36,11 @@ def home():
             return redirect(url_for('register', token=token))
     return render_template('index.html', form=form)
 
+
 @app.route('/register/<token>', methods=['GET', 'POST'])
 def register(token):
+    '''allows a user to change their voting location
+    '''
     session['visited'] = True
     session['token'] = token
     current_user = redisClient.hgetall(token)
@@ -56,8 +63,11 @@ def register(token):
             }
     return render_template('new_county_or_constituency.html', form=form, mapping=mapping, token=token)
 
+
 @app.route('/president/<token>', methods=['GET', 'POST'])
 def president(token):
+    '''Presidential voting
+    '''
     session['visited'] = True
     session['token'] = token
     current_user = redisClient.hgetall(token)
@@ -86,8 +96,11 @@ def president(token):
     candidates = candidates_collection.find({'position': 'president'}, {'_id': 0, 'name': 1, 'party': 1})
     return render_template('voting.html', candidates=candidates, form=form, voter=voter, logo='Presidential Candidates')
 
+
 @app.route('/governor/<token>', methods=['GET', 'POST'])
 def governor(token):
+    '''governor voting
+    '''
     session['visited'] = True
     session['token'] = token
     current_user = redisClient.hgetall(token)
@@ -118,8 +131,11 @@ def governor(token):
         return redirect(url_for('mp', token=token))
     return render_template('voting.html', form=form, candidates=candidates, voter=voter, logo='{} Governor Candidates'.format(voter_county))
 
+
 @app.route('/mp/<token>', methods=['GET', 'POST'])
 def mp(token):
+    '''mp voting
+    '''
     session['visited'] = True
     session['token'] = token
     current_user = redisClient.hgetall(token)
@@ -153,6 +169,8 @@ def mp(token):
 
 @app.route('/view/<token>', methods=['GET', 'POST'])
 def view(token):
+    '''allows a voter to see their selected candidates
+    '''
     # session['visited'] = True
     # session['token'] = token
     current_user = redisClient.hgetall(token)
@@ -175,8 +193,11 @@ def view(token):
         return redirect(url_for('home'))
     return render_template('view.html', mapping=mapping, form=form, token=token)
 
+
 @app.route('/change_county/<token>', methods=['GET', 'POST'])
 def change_county(token):
+    '''allows one to change their default voting county
+    '''
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -191,8 +212,11 @@ def change_county(token):
         return redirect(url_for('register', token=token))
     return render_template('change_place.html', form=form, logo='All Counties')
 
+
 @app.route('/change_constituency/<token>', methods=['GET', 'POST'])
 def change_constituency(token):
+    '''allows one to change their default voting constituency
+    '''
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
@@ -212,6 +236,9 @@ def change_constituency(token):
         return redirect(url_for('register', token=token))
     return render_template('change_place.html', form=form, logo='{} constituencies'.format(user_county))
 
+
 @app.context_processor
 def is_navbar_valid():
+    '''habdles logic for showing nav bar only when a user is validated
+    '''
     return {'valid_navbar': session.get('visited', False), 'my_token': session.get('token')}
