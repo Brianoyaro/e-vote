@@ -22,7 +22,7 @@ e_vote has a nice UX which is easy to use.
 ---
 e_vote was created with security in mind. Users have to login using credential in their national ID cards which helps distinguish candidate positions based on locality such as governors and MPs. Users have an option of changing their voting location simulating real world scenarios where they relocate to diferent regions to the ones recorded in their ID cards.
 Users have a time limit of 10 minutes to vote upon which on exhaustion requires them to relogin and vote again incase they did not submit their results.
-![alt text](https://github.com/Brianoyaro/e-vote/blob/main/app/static/logo.png "Logo")
+![alt text]('https://github.com/Brianoyaro/e-vote/blob/master/app/static/logo.png')
 
 ### /API
 ---
