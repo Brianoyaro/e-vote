@@ -13,13 +13,19 @@ geo = db['geo']
 
 places = [
         {'county': 'Mombasa', 'constituencies': ['Kisauni', 'Likoni', 'Kashani']},
-        {'county': 'Nairobi', 'constituencies': ['Mwiki', 'CBD']}
+        {'county': 'Nairobi', 'constituencies': ['Mwiki', 'CBD']},
+        {'county': 'Ruiru', 'constituencies': ['Ruwashio', 'Ruiru-constituency']},
+        {'county': 'Zangina', 'constituencies': ['King Kongo', 'Karibu Sana']},
+        {'county': 'Murisho', 'constituencies': ['Lakunzoi', 'Kimeleo']}
         ]
 
 voters = [
         {'idNumber': 1, 'serialNumber': 1, 'name': 'Brian Mokua', 'county': 'Mombasa', 'constituency': 'Kisauni'},
         {'idNumber': 2, 'serialNumber': 2, 'name': 'Johnstone Kahindi', 'county': 'Kilifi', 'constituency': 'Kilifi-poly'},
-        {'idNumber': 3, 'serialNumber': 3, 'name': 'Sylvetser Onyango', 'county': 'Kajiado', 'constituency': 'Kiserian'}
+        {'idNumber': 3, 'serialNumber': 3, 'name': 'Sylvetser Onyango', 'county': 'Kajiado', 'constituency': 'Kiserian'},
+        {'idNumber': 4, 'serialNumber': 4, 'name': 'Bernard Odondi', 'county': 'Murisho', 'constituency': 'Kimeleo'},
+        {'idNumber': 5, 'serialNumber': 5, 'name': "Annette Mtukud'zi", 'county': 'Zangina', 'constituency': 'Karibu Sana'},
+        {'idNumber': 6, 'serialNumber': 6, 'name': 'Anne Kamau', 'county': 'Ruiru', 'constituency': 'Ruiru-constituency'}
 ]
 candidates = [
         {'position': 'president', 'name': 'Raila Odinga', 'party': 'ODM', 'count': 0},

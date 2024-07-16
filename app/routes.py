@@ -1,4 +1,4 @@
-from flask import render_template, request, redirect, url_for, flash, abort, session
+from flask import render_template, redirect, url_for, flash, abort, session
 from app.forms import LoginForm, SubmitForm, ChoiceForm, ChangePlaceForm
 from app import app, redisClient, voters_collection as voters, candidates_collection, geo
 import uuid
@@ -46,9 +46,6 @@ def register(token):
     current_user = redisClient.hgetall(token)
     if not current_user:
         abort(404)
-    form = SubmitForm()
-    if form.validate_on_submit():
-        return redirect(url_for('president', token=token))
     voter = voters.find_one({'idNumber': int(current_user.get('idNumber'))})
     user_county = voter.get('votingCounty')
     if not user_county:
@@ -61,7 +58,7 @@ def register(token):
             'county': user_county,
             'constituency': user_constituency
             }
-    return render_template('new_county_or_constituency.html', form=form, mapping=mapping, token=token)
+    return render_template('new_county_or_constituency.html', mapping=mapping, token=token)
 
 
 @app.route('/president/<token>', methods=['GET', 'POST'])
